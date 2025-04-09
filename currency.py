@@ -1,4 +1,7 @@
-from datafake import CURRENCY_NAMES, EXCHANGE_RATE
+from utils import CURRENCY_NAMES, EXCHANGE_RATE, get_exchange_rate
+import requests
+
+
 
 class Currency:
     def __init__(self, valor, code):
@@ -51,16 +54,13 @@ class Currency:
         raise ValueError(f"{dr} deve ser um valor inteiro ou float.")
 
     def convert(self, to_code):
-        rate = EXCHANGE_RATE[self.code][to_code]
         to_code = to_code.upper()
-        value = rate * self.valor
-        return Currency(value, to_code)
+        rate = get_exchange_rate(self.code, to_code)
+        return Currency(rate * self.valor, to_code)
 
 
 
-
-
-moeda1 = Currency(50, "BRL")
-moeda2 = Currency(52, "BE")
-
-print(moeda1 * moeda2)
+if __name__ == '__main__':
+    moeda1 = Currency(10, "usd")
+    moeda2 = Currency(58, "brl")
+    print(f"{moeda1} equivalem a {moeda1.convert('brl')}")
