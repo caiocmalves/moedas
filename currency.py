@@ -1,3 +1,5 @@
+from datafake import CURRENCY_NAMES, EXCHANGE_RATE
+
 class Currency:
     def __init__(self, valor, code):
         self.valor = valor
@@ -7,14 +9,14 @@ class Currency:
         return f"{self.valor:.2f}{self.code}"
 
     def __eq__(self, dr):
-        if (self.valor == dr.valor) and (self.code == dr.code):
-            return True
-        return False
+        if (self.code == dr.code):
+            return self.valor == dr.valor
+        return self == dr.convert(self.code)
     
     def __gt__(self, dr):
         if self.code == dr.code:
             return self.valor > dr.valor
-        raise ValueError("Moedas devem ser do mesmo país!")
+        return self > dr.convert(self.code)
     
     def __ge__(self, dr):
         return (self > dr) or (self == dr)
@@ -38,10 +40,23 @@ class Currency:
     def __rmul__(self, es):
         return self * es
 
-    def __div__(self, dr):
+    def __truediv__(self, dr):
         if isinstance(dr, int) or isinstance(dr, float):
             return Currency(self.valor / dr, self.code)
         raise ValueError(f"{dr} deve ser um valor inteiro ou float.")
+
+    def __floordiv__(self, dr):
+        if isinstance(dr, int) or isinstance(dr, float):
+            return Currency(self.valor // dr, self.code)
+        raise ValueError(f"{dr} deve ser um valor inteiro ou float.")
+
+    def convert(self, to_code):
+        rate = EXCHANGE_RATE[self.code][to_code]
+        to_code = to_code.upper()
+        value = rate * self.valor
+        return Currency(value, to_code)
+
+
 
 
 
